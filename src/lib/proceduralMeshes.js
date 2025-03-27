@@ -11,26 +11,25 @@ const lobeConfig = [
 ];
 
 // --- Material Definitions ---
-const defaultMaterial = new THREE.MeshStandardMaterial({
+// Define base materials once
+const baseMaterialSettings = {
     roughness: 0.7,
     metalness: 0.1,
     transparent: true,
     opacity: 0.9
-});
+};
 
-const highlightMaterial = new THREE.MeshStandardMaterial({
-    roughness: 0.7,
-    metalness: 0.1,
-    emissive: 0x333300, // Slight yellow glow
-    transparent: true,
+const defaultMaterialBase = new THREE.MeshStandardMaterial(baseMaterialSettings);
+
+const highlightMaterialBase = new THREE.MeshStandardMaterial({
+    ...baseMaterialSettings, // Spread base settings
+    emissive: 0x555555, // Add emissive for highlight
     opacity: 1.0
 });
 
-const selectedMaterial = new THREE.MeshStandardMaterial({
-    roughness: 0.7,
-    metalness: 0.1,
-    emissive: 0x666600, // Stronger yellow glow
-    transparent: true,
+const selectedMaterialBase = new THREE.MeshStandardMaterial({
+    ...baseMaterialSettings, // Spread base settings
+    emissive: 0xAAAAAA, // Stronger emissive for selected
     opacity: 1.0,
     // wireframe: true // Optional: Use wireframe for selection
 });
@@ -49,45 +48,65 @@ function createProceduralLobes() {
         // Using BoxGeometry - alternative simple shape
         // const geometry = new THREE.BoxGeometry(config.scale.x, config.scale.y, config.scale.z);
 
-        const material = defaultMaterial.clone(); // Clone to set unique color
-        material.color.setHex(config.color);
+        // Clone base materials and set unique color for this lobe
+        const originalMaterial = defaultMaterialBase.clone();
+        originalMaterial.color.setHex(config.color);
 
-        const mesh = new THREE.Mesh(geometry, material);
+        const highlightMaterial = highlightMaterialBase.clone();
+        highlightMaterial.color.setHex(config.color); // Keep base color
+
+        const selectedMaterial = selectedMaterialBase.clone();
+        selectedMaterial.color.setHex(config.color); // Keep base color
+
+
+        const mesh = new THREE.Mesh(geometry, originalMaterial); // Start with original material
         mesh.position.set(config.position.x, config.position.y, config.position.z);
 
         // Store metadata for identification and interaction
         mesh.userData = {
             name: config.name,
             type: 'lobe',
-            originalMaterial: material, // Store original for hover-off/deselect
-            highlightMaterial: highlightMaterial.clone().setValues({color: material.color, emissive: 0x555555}), // Keep base color, add emissive
-            selectedMaterial: selectedMaterial.clone().setValues({color: material.color, emissive: 0xAAAAAA}), // Keep base color, stronger emissive
+            originalMaterial: originalMaterial, // Store the specific cloned material instance
+            highlightMaterial: highlightMaterial, // Store the specific cloned material instance
+            selectedMaterial: selectedMaterial, // Store the specific cloned material instance
         };
 
         brainGroup.add(mesh);
         lobeMeshes.push(mesh);
     });
 
-    // Adjust Temporal Lobe rotation slightly for better asymmetry (example)
+    // --- Handle Mirroring for Temporal Lobe ---
     const temporalLobeMesh = lobeMeshes.find(m => m.userData.name === 'Temporal Lobe');
     if (temporalLobeMesh) {
-        temporalLobeMesh.rotation.y = -Math.PI / 16; // Slight inward rotation
+        // Apply asymmetry adjustments to the first one if desired
+        temporalLobeMesh.rotation.y = -Math.PI / 16; // Slight inward rotation (optional)
 
-        // Add the other Temporal Lobe (mirrored)
-        const temporalLobeMeshRight = temporalLobeMesh.clone();
-        temporalLobeMeshRight.position.x *= -1; // Mirror position
-        temporalLobeMeshRight.rotation.y *= -1; // Mirror rotation
-        // Important: Clone userData materials too if you didn't share them
-         temporalLobeMeshRight.userData = JSON.parse(JSON.stringify(temporalLobeMesh.userData)); // Deep copy simple data
-         temporalLobeMeshRight.userData.originalMaterial = temporalLobeMesh.userData.originalMaterial.clone();
-         temporalLobeMeshRight.userData.highlightMaterial = temporalLobeMesh.userData.highlightMaterial.clone();
-         temporalLobeMeshRight.userData.selectedMaterial = temporalLobeMesh.userData.selectedMaterial.clone();
+        // Clone the first temporal lobe mesh to create the second one
+        const temporalLobeMeshRight = temporalLobeMesh.clone(); // Clones geometry, position, rotation, scale
 
+        // Mirror its position and rotation
+        temporalLobeMeshRight.position.x *= -1;
+        temporalLobeMeshRight.rotation.y *= -1;
 
+        // --- Correctly Handle userData and Materials for the Clone ---
+        // Create a new userData object for the cloned mesh
+        temporalLobeMeshRight.userData = {
+            name: temporalLobeMesh.userData.name, // Keep the same name
+            type: temporalLobeMesh.userData.type, // Keep the same type
+            // Create *new* clones of the materials specific to the right lobe
+            originalMaterial: temporalLobeMesh.userData.originalMaterial.clone(),
+            highlightMaterial: temporalLobeMesh.userData.highlightMaterial.clone(),
+            selectedMaterial: temporalLobeMesh.userData.selectedMaterial.clone(),
+        };
+        // Set the cloned mesh's active material to its own unique original material
+        temporalLobeMeshRight.material = temporalLobeMeshRight.userData.originalMaterial;
+        // --- End Corrected Handling ---
+
+        // Add the mirrored lobe to the group and the interactable list
         brainGroup.add(temporalLobeMeshRight);
-        lobeMeshes.push(temporalLobeMeshRight); // Add to interactable list
+        lobeMeshes.push(temporalLobeMeshRight);
     }
-
+    // --- End Mirroring ---
 
     brainGroup.position.y = -0.5; // Center the group roughly vertically
     return { brainGroup, lobeMeshes };
