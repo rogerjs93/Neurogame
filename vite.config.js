@@ -8,7 +8,7 @@ export default defineConfig({
   // Example: https://rogerjs93.github.io/Neurogame/
   base: `/${repositoryName}/`,
   build: {
-    outDir: 'dist', // Ensure the output directory is 'dist'
+    outDir: 'docs', // Ensure the output directory is 'dist'
   },
   server: {
     // Optional: configure the dev server if needed
