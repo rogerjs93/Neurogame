@@ -1,0 +1,65 @@
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow: hidden; /* Prevent scrollbars */
+  font-family: sans-serif;
+}
+
+/* Canvas Styling */
+#bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block; /* Remove potential extra space below canvas */
+  background-color: #1a1a2e; /* Dark background */
+}
+
+/* UI Overlay Styling */
+#ui-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 300px;
+  z-index: 10; /* Ensure it's above the canvas */
+}
+
+#ui-container h1 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+#instructions {
+  margin-bottom: 8px;
+  font-size: 1.1em;
+  min-height: 1.2em; /* Prevent layout shift */
+}
+
+#score {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+#feedback {
+  min-height: 1.2em; /* Prevent layout shift */
+  font-style: italic;
+  transition: opacity 0.5s ease-out;
+}
+
+#feedback.correct {
+    color: #4caf50; /* Green */
+}
+
+#feedback.incorrect {
+    color: #f44336; /* Red */
+}
