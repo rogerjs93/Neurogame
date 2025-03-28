@@ -2,10 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" /> <!-- Adjust if you have a favicon -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neuro Explorer - Phase 1</title>
-    <link rel="stylesheet" href="/src/style.css">
+    <title>Neuro Explorer - Phase 2</title>
+    <!-- Link CSS using relative path -->
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <canvas id="bg"></canvas>
@@ -15,6 +16,11 @@
         <div id="instructions">Loading...</div>
         <div id="score">Score: 0</div>
         <div id="feedback"></div>
+        <!-- New Info Display Area -->
+        <div id="info-display">
+            <h3 id="info-name"></h3>
+            <p id="info-details"></p>
+        </div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
