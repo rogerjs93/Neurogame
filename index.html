@@ -4,77 +4,63 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Updated Title -->
-    <title>Neuro Explorer - Phase 3</title>
+    <title>Neuro Explorer - Brain Anatomy</title>
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <!-- Main Brain Canvas -->
+    <!-- Single Canvas for the Brain -->
     <canvas id="bg-brain"></canvas>
+
     <!-- Main UI Container -->
     <div id="ui-container">
         <h1>Neuro Explorer</h1>
-        <!-- View Toggle Button -->
-        <button id="toggle-view-btn" style="margin-bottom: 10px;">View Action Potential</button>
-        <!-- Brain View UI (Score, Instructions etc.) -->
+
+        <!-- Brain View UI (Always visible now) -->
         <div id="brain-ui">
              <div id="instructions">Loading...</div>
              <div id="score">Score: 0</div>
              <div id="feedback"></div>
+             <!-- Info Display Area -->
              <div id="info-display">
                  <h3 id="info-name"></h3>
                  <p id="info-details"></p>
              </div>
+             <!-- Layer Toggles -->
              <div id="layer-toggles" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
-                 <h4>Layers:</h4>
-                 <label>
-                     <input type="checkbox" id="toggle-lobes" checked> Lobes (Cortex)
-                 </label><br>
-                 <label>
-                     <input type="checkbox" id="toggle-deep" checked> Deep Structures
-                 </label><br>
-                 <label>
-                     <input type="checkbox" id="toggle-nerves" checked> Cranial Nerves
-                 </label>
-             </div>
-             <div id="clipping-controls" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
-                 <h4>Clipping (Section):</h4>
-                 <label>
-                      <input type="checkbox" id="clip-enable"> Enable Clipping
-                 </label><br>
-                  <label>Axis:
-                     <select id="clip-axis">
-                         <option value="X" selected>X (Sagittal)</option>
-                         <option value="Y">Y (Axial/Horizontal)</option>
-                         <option value="Z">Z (Coronal)</option>
-                     </select>
+                  <h4>Layers:</h4>
+                  <label>
+                      <input type="checkbox" id="toggle-lobes" checked> Lobes (Cortex)
                   </label><br>
-                 <label>Position:</label>
-                 <input type="range" id="clip-slider" min="-5" max="5" step="0.1" value="0" style="width: 100%;">
-                 <span id="clip-value">0.0</span><br>
-                 <label>
-                      <input type="checkbox" id="clip-negate"> Flip Side
-                 </label>
+                  <label>
+                      <input type="checkbox" id="toggle-deep" checked> Deep Structures
+                  </label><br>
+                  <label>
+                      <input type="checkbox" id="toggle-nerves" checked> Cranial Nerves
+                  </label>
              </div>
-        </div>
-        <!-- Action Potential View UI (Initially Hidden) -->
-        <div id="ap-ui" style="display: none;">
-             <h3>Action Potential Simulation</h3>
-             <!-- AP Controls -->
-             <div id="ap-controls" style="margin-top: 10px;">
-                <button id="ap-play-btn">Play</button>
-                <button id="ap-pause-btn">Pause</button>
-                <button id="ap-step-btn">Step</button>
-                <button id="ap-reset-btn">Reset</button>
+             <!-- Clipping Planes -->
+             <div id="clipping-controls" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+                  <h4>Clipping (Section):</h4>
+                  <label>
+                       <input type="checkbox" id="clip-enable"> Enable Clipping
+                  </label><br>
+                   <label>Axis:
+                      <select id="clip-axis">
+                          <option value="X" selected>X (Sagittal)</option>
+                          <option value="Y">Y (Axial/Horizontal)</option>
+                          <option value="Z">Z (Coronal)</option>
+                      </select>
+                   </label><br>
+                  <label>Position:</label>
+                  <input type="range" id="clip-slider" min="-7" max="7" step="0.1" value="0" style="width: 100%;"> <!-- Adjusted range -->
+                  <span id="clip-value">0.0</span><br>
+                  <label>
+                       <input type="checkbox" id="clip-negate"> Flip Side
+                  </label>
              </div>
-             <!-- Potential Graph Placeholder -->
-             <div id="ap-potential-graph" style="margin-top: 10px; height: 50px; background-color: #222; border: 1px solid #555; position: relative;">
-                 <div id="potential-indicator" style="position: absolute; left: 50%; bottom: 0; width: 4px; height: 100%; background-color: yellow;"></div>
-                 <span id="potential-value" style="position: absolute; top: 2px; left: 5px; font-size: 0.8em; color: yellow;">-70 mV</span>
-             </div>
-             <!-- Add game instructions/score for AP mini-game here later -->
         </div>
     </div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
