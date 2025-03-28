@@ -4,14 +4,12 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 html, body {
   overflow: hidden; /* Prevent scrollbars */
   font-family: sans-serif;
 }
-
 /* Canvas Styling */
-#bg {
+#bg-brain {
   position: fixed;
   top: 0;
   left: 0;
@@ -20,7 +18,6 @@ html, body {
   display: block; /* Remove potential extra space below canvas */
   background-color: #1a1a2e; /* Dark background */
 }
-
 /* UI Overlay Styling */
 #ui-container {
   position: absolute;
@@ -31,40 +28,35 @@ html, body {
   padding: 15px;
   border-radius: 8px;
   max-width: 300px;
+  max-height: 95vh;
+  overflow-y: auto;
   z-index: 10; /* Ensure it's above the canvas */
 }
-
 #ui-container h1 {
   font-size: 1.5em;
   margin-bottom: 10px;
 }
-
 #instructions {
   margin-bottom: 8px;
   font-size: 1.1em;
   min-height: 1.2em; /* Prevent layout shift */
 }
-
 #score {
   margin-bottom: 8px;
   font-weight: bold;
 }
-
 #feedback {
   min-height: 1.2em; /* Prevent layout shift */
   font-style: italic;
   transition: opacity 0.5s ease-out;
   opacity: 0; /* Start faded out */
 }
-
 #feedback.correct {
     color: #4caf50; /* Green */
 }
-
 #feedback.incorrect {
     color: #f44336; /* Red */
 }
-
 /* Info Display Box */
 #info-display {
     margin-top: 15px;
@@ -75,18 +67,15 @@ html, body {
     min-height: 50px; /* Ensure it has some height even when empty */
     display: none; /* Initially hidden */
 }
-
 #info-display h3 {
     margin-bottom: 5px;
     color: #50e3c2; /* Match brainstem color or choose another */
     font-size: 1.1em;
 }
-
 #info-display p {
     font-size: 0.9em;
     line-height: 1.4;
 }
-
 /* Layer Toggles & Clipping Controls Styling */
 #layer-toggles, #clipping-controls {
     background-color: rgba(10, 10, 30, 0.6);
@@ -94,7 +83,6 @@ html, body {
     border-radius: 4px;
     margin-top: 10px; /* Consistent spacing */
 }
-
 #layer-toggles h4, #clipping-controls h4 {
     margin-bottom: 8px;
     font-size: 1em;
@@ -102,7 +90,6 @@ html, body {
     border-bottom: 1px solid #444; /* Separator */
     padding-bottom: 4px;
 }
-
 #layer-toggles label, #clipping-controls label {
     display: block; /* Make labels take full width for better spacing */
     margin-bottom: 5px;
@@ -117,8 +104,6 @@ html, body {
      display: block;
      margin-bottom: 2px;
 }
-
-
 #clipping-controls input[type="range"] {
     vertical-align: middle;
     width: calc(100% - 40px); /* Adjust width to fit next to value */
@@ -129,7 +114,6 @@ html, body {
     width: 35px; /* Fixed width for value display */
     text-align: right;
 }
-
 #clipping-controls select {
     background-color: #333;
     color: white;
@@ -138,9 +122,65 @@ html, body {
     border-radius: 3px;
     margin-left: 5px;
 }
-
 /* Ensure checkboxes are aligned nicely */
 input[type="checkbox"] {
     vertical-align: middle;
     margin-right: 5px;
+}
+
+/* New Action Potential View Styles */
+/* Style for AP Controls */
+#ap-controls button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    background-color: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+}
+#ap-controls button:hover {
+    background-color: #555;
+}
+#ap-controls button:active {
+    background-color: #333;
+}
+
+/* Style for Potential Graph Placeholder */
+#ap-potential-graph {
+    margin-top: 10px; 
+    height: 50px; 
+    background-color: #222; 
+    border: 1px solid #555; 
+    position: relative;
+}
+#potential-indicator {
+    position: absolute; 
+    left: 50%; 
+    bottom: 0; 
+    width: 4px; 
+    height: 100%; 
+    background-color: yellow;
+    transition: bottom 0.1s linear; /* Smooth transition */
+}
+#potential-value {
+    position: absolute; 
+    top: 2px; 
+    left: 5px; 
+    font-size: 0.8em; 
+    color: yellow;
+}
+
+/* Style for the view toggle button */
+#toggle-view-btn {
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+#toggle-view-btn:hover {
+    background-color: #0056b3;
 }
