@@ -1,90 +1,121 @@
 import * as THREE from 'three';
-import { camera, renderer, scene } from './sceneSetup.js'; // Import needed Three.js elements
-import { handleLobeSelection } from './gameLogic.js'; // Import game logic handler
+import { camera, renderer } from './sceneSetup.js';
+import { handleSelection } from './gameLogic.js'; // Updated function name
+import { displayInfo, hideInfo } from './uiManager.js';
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-let interactableObjects = []; // Will hold the lobe meshes
+let interactableObjects = [];
 let hoveredObject = null;
 let selectedObject = null;
 
 function initInteraction(objectsToInteract) {
-    interactableObjects = objectsToInteract; // Store the meshes passed from main.js
+    interactableObjects = objectsToInteract; // Expects a single flat array
 
-    // Add event listeners to the renderer's canvas
     renderer.domElement.addEventListener('mousemove', onMouseMove, false);
     renderer.domElement.addEventListener('click', onClick, false);
+    // Use 'mousedown' on the canvas to catch clicks that don't hit an object
+    renderer.domElement.addEventListener('mousedown', onMouseDownOutside, false);
 }
 
-function onMouseMove(event) {
-    // Calculate mouse position in normalized device coordinates (-1 to +1)
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+// Helper to apply material state
+function applyMaterial(object, materialType) {
+    if (!object || !object.userData || !object.userData.originalMaterial) return; // Basic safety checks
 
-    // Update the picking ray with the camera and mouse position
-    raycaster.setFromCamera(mouse, camera);
-
-    // Calculate objects intersecting the picking ray
-    const intersects = raycaster.intersectObjects(interactableObjects);
-
-    // --- Handle Hover ---
-    if (intersects.length > 0) {
-        const firstIntersect = intersects[0].object;
-        // Check if it's a lobe and not already hovered
-        if (firstIntersect.userData.type === 'lobe' && firstIntersect !== hoveredObject) {
-            // Unhover previous object
-            if (hoveredObject && hoveredObject !== selectedObject) { // Don't unhighlight selected
-                hoveredObject.material = hoveredObject.userData.originalMaterial;
-            }
-            // Hover current object
-            hoveredObject = firstIntersect;
-            if (hoveredObject !== selectedObject) { // Don't overwrite selected highlight
-                 hoveredObject.material = hoveredObject.userData.highlightMaterial;
-            }
-        }
-    } else {
-        // No intersection or intersected object is not a lobe
-        if (hoveredObject && hoveredObject !== selectedObject) { // Don't unhighlight selected
-             hoveredObject.material = hoveredObject.userData.originalMaterial;
-        }
-        hoveredObject = null;
+    switch (materialType) {
+        case 'original':
+            object.material = object.userData.originalMaterial;
+            break;
+        case 'highlight':
+            // Ensure highlight material exists before assigning
+            object.material = object.userData.highlightMaterial || object.userData.originalMaterial;
+            break;
+        case 'selected':
+            // Ensure selected material exists before assigning
+            object.material = object.userData.selectedMaterial || object.userData.originalMaterial;
+            break;
+        default:
+            object.material = object.userData.originalMaterial; // Fallback
     }
 }
 
-function onClick(event) {
-     // Calculate mouse position in normalized device coordinates (-1 to +1)
+function onMouseMove(event) {
+    // Optimization: only update raycaster if mouse moved significantly? Maybe not needed yet.
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(interactableObjects);
+    const intersects = raycaster.intersectObjects(interactableObjects, false); // 'false' for non-recursive
 
-    if (intersects.length > 0) {
-        const clickedObj = intersects[0].object;
+    const firstIntersect = intersects.length > 0 ? intersects[0].object : null;
 
-        if (clickedObj.userData.type === 'lobe') {
-            // --- Handle Selection ---
-            // Deselect previous object
-            if (selectedObject && selectedObject !== clickedObj) {
-                selectedObject.material = selectedObject.userData.originalMaterial;
-            }
-
-             // Select the new object
-            selectedObject = clickedObj;
-            selectedObject.material = selectedObject.userData.selectedMaterial; // Apply selected highlight
-
-            // --- Trigger Game Logic ---
-            handleLobeSelection(clickedObj.userData.name); // Pass the name to the game
+    // Handle Hover Exit
+    if (hoveredObject && hoveredObject !== firstIntersect) {
+        if (hoveredObject !== selectedObject) { // Don't unhighlight selected object
+            applyMaterial(hoveredObject, 'original');
         }
-    } else {
-         // Optional: Clicking outside deselects
-         if (selectedObject) {
-             selectedObject.material = selectedObject.userData.originalMaterial;
-             selectedObject = null;
+        hoveredObject = null;
+    }
+
+    // Handle Hover Enter
+    if (firstIntersect && firstIntersect !== hoveredObject) {
+         hoveredObject = firstIntersect;
+         if (hoveredObject !== selectedObject) { // Don't overwrite selected highlight
+             applyMaterial(hoveredObject, 'highlight');
          }
     }
 }
 
-// Export lobeMeshes so gameLogic can access names if needed
-export { initInteraction, interactableObjects as lobeMeshes };
+function onClick(event) {
+    // Raycast again on click to be sure (mouse might have moved slightly)
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(interactableObjects, false);
+
+    if (intersects.length > 0) {
+        const clickedObj = intersects[0].object;
+
+        if (clickedObj.userData) { // Check if it's one of our interactive objects
+            // Deselect previous, if it exists and is different
+            if (selectedObject && selectedObject !== clickedObj) {
+                applyMaterial(selectedObject, 'original');
+            }
+
+            // Select the new object
+            selectedObject = clickedObj;
+            applyMaterial(selectedObject, 'selected');
+
+            // Display info in the UI panel
+            displayInfo(selectedObject.userData.name, selectedObject.userData.info);
+
+            // Trigger Game Logic - pass the whole object or just its data
+            handleSelection(selectedObject); // Pass the mesh itself
+
+            // Stop this event from bubbling up to the 'mousedown' listener on the canvas
+            event.stopPropagation();
+        }
+    }
+    // If intersects.length is 0, the click was outside; onMouseDownOutside will handle it.
+}
+
+// Handles clicks on the background (canvas)
+function onMouseDownOutside(event) {
+    // We need to check if the click actually missed all interactable objects
+    // Raycast one more time on mousedown event coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(interactableObjects, false);
+
+    if (intersects.length === 0) { // Truly clicked outside
+        if (selectedObject) {
+            applyMaterial(selectedObject, 'original'); // Deselect visually
+            selectedObject = null; // Forget selection
+        }
+        hideInfo(); // Hide the info panel
+    }
+    // If intersects.length > 0, the 'click' event on the object will handle selection/info.
+}
+
+export { initInteraction }; // Only export the init function

@@ -2,11 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/Neurogame/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/Neurogame/vite.svg" /> <!-- Adjust if you have a favicon -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neuro Explorer - Phase 1</title>
-    <script type="module" crossorigin src="/Neurogame/assets/index-Ds64dbBu.js"></script>
-    <link rel="stylesheet" crossorigin href="/Neurogame/assets/index-d3bMGwL_.css">
+    <title>Neuro Explorer - Phase 2</title>
+    <!-- Link CSS using relative path -->
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" crossorigin src="/Neurogame/assets/index-DMeZeCWC.js"></script>
   </head>
   <body>
     <canvas id="bg"></canvas>
@@ -16,6 +17,11 @@
         <div id="instructions">Loading...</div>
         <div id="score">Score: 0</div>
         <div id="feedback"></div>
+        <!-- New Info Display Area -->
+        <div id="info-display">
+            <h3 id="info-name"></h3>
+            <p id="info-details"></p>
+        </div>
     </div>
 
   </body>
