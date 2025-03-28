@@ -105,9 +105,19 @@ function handleClippingSlider() {
     }
 }
 
+
 function updateClipValueDisplay(value) {
     if (clipValueSpan) {
-        clipValueSpan.textContent = value.toFixed(1);
+        // *** ADD CHECK HERE ***
+        // Ensure 'value' is a finite number before calling toFixed()
+        if (typeof value === 'number' && isFinite(value)) {
+            clipValueSpan.textContent = value.toFixed(1);
+        } else {
+            // Handle cases where value is NaN or not a number (e.g., initial state or error)
+            clipValueSpan.textContent = '---'; // Or '0.0' or some default
+            console.warn("updateClipValueDisplay received invalid value:", value); // Log warning
+        }
+        // *********************
     }
 }
 
