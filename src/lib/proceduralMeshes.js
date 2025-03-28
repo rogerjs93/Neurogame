@@ -285,4 +285,8 @@ function createBrainModel() {
     return { brainGroup, allMeshes };
 }
 
+<<<<<<< HEAD
 export { createBrainModel }; // Export the main function
+=======
+export { createBrainModel }; // Export the main function
+>>>>>>> 6d0e3509b060d413bb2268cc0a34a16f0e8d46c5

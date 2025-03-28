@@ -92,4 +92,8 @@ export {
     showWinMessage,
     displayInfo, // Export new function
     hideInfo     // Export new function
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 6d0e3509b060d413bb2268cc0a34a16f0e8d46c5
