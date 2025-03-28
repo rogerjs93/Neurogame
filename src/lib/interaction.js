@@ -118,8 +118,4 @@ function onMouseDownOutside(event) {
     // If intersects.length > 0, the 'click' event on the object will handle selection/info.
 }
 
-<<<<<<< HEAD
 export { initInteraction }; // Only export the init function
-=======
-export { initInteraction }; // Only export the init function
->>>>>>> 6d0e3509b060d413bb2268cc0a34a16f0e8d46c5

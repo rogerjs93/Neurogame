@@ -2,10 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" /> <!-- Adjust if you have a favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neuro Explorer - Phase 2</title>
-    <!-- Link CSS using relative path -->
+    <title>Neuro Explorer - Phase 2+</title>
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
@@ -16,11 +15,48 @@
         <div id="instructions">Loading...</div>
         <div id="score">Score: 0</div>
         <div id="feedback"></div>
-        <!-- New Info Display Area -->
+
+        <!-- Info Display Area -->
         <div id="info-display">
             <h3 id="info-name"></h3>
             <p id="info-details"></p>
         </div>
+
+        <!-- Layer Toggles -->
+        <div id="layer-toggles" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+            <h4>Layers:</h4>
+            <label>
+                <input type="checkbox" id="toggle-lobes" checked> Lobes (Cortex)
+            </label><br>
+            <label>
+                <input type="checkbox" id="toggle-deep" checked> Deep Structures
+            </label><br>
+            <label>
+                <input type="checkbox" id="toggle-nerves" checked> Cranial Nerves
+            </label>
+        </div>
+
+        <!-- Clipping Planes -->
+        <div id="clipping-controls" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+            <h4>Clipping (Section):</h4>
+            <label>
+                 <input type="checkbox" id="clip-enable"> Enable Clipping
+            </label><br>
+             <label>Axis:
+                <select id="clip-axis">
+                    <option value="X" selected>X (Sagittal)</option>
+                    <option value="Y">Y (Axial/Horizontal)</option>
+                    <option value="Z">Z (Coronal)</option>
+                </select>
+             </label><br>
+            <label>Position:</label>
+            <input type="range" id="clip-slider" min="-5" max="5" step="0.1" value="0" style="width: 100%;">
+            <span id="clip-value">0.0</span><br>
+            <label>
+                 <input type="checkbox" id="clip-negate"> Flip Side
+            </label>
+        </div>
+
     </div>
 
     <script type="module" src="/src/main.js"></script>

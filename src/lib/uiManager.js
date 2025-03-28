@@ -1,99 +1,172 @@
+// --- Existing Variables ---
 let instructionElement, scoreElement, feedbackElement;
-let infoDisplayElement, infoNameElement, infoDetailsElement; // New elements
+let infoDisplayElement, infoNameElement, infoDetailsElement;
 
-function initUI() {
+// --- New UI Element Variables ---
+let toggleLobesCheckbox, toggleDeepCheckbox, toggleNervesCheckbox;
+let clipEnableCheckbox, clipAxisSelect, clipSlider, clipValueSpan, clipNegateCheckbox;
+
+// --- Callbacks for UI Interaction ---
+let onLayerToggleCallback = null;
+let onClippingChangeCallback = null;
+
+// Accept callbacks during initialization
+function initUI(layerToggleCb, clippingChangeCb) {
     instructionElement = document.getElementById('instructions');
     scoreElement = document.getElementById('score');
     feedbackElement = document.getElementById('feedback');
-    // Get new elements
     infoDisplayElement = document.getElementById('info-display');
     infoNameElement = document.getElementById('info-name');
     infoDetailsElement = document.getElementById('info-details');
 
+    // Get Layer Toggle elements
+    toggleLobesCheckbox = document.getElementById('toggle-lobes');
+    toggleDeepCheckbox = document.getElementById('toggle-deep');
+    toggleNervesCheckbox = document.getElementById('toggle-nerves');
 
-    if (!instructionElement || !scoreElement || !feedbackElement || !infoDisplayElement || !infoNameElement || !infoDetailsElement) {
-        console.error("UI elements not found!");
-        return false;
+    // Get Clipping elements
+    clipEnableCheckbox = document.getElementById('clip-enable');
+    clipAxisSelect = document.getElementById('clip-axis');
+    clipSlider = document.getElementById('clip-slider');
+    clipValueSpan = document.getElementById('clip-value');
+    clipNegateCheckbox = document.getElementById('clip-negate');
+
+    // Comprehensive check for all elements
+    if (!instructionElement || !scoreElement || !feedbackElement || !infoDisplayElement || !infoNameElement || !infoDetailsElement || !toggleLobesCheckbox || !toggleDeepCheckbox || !toggleNervesCheckbox || !clipEnableCheckbox || !clipAxisSelect || !clipSlider || !clipValueSpan || !clipNegateCheckbox) {
+        console.error("One or more UI elements were not found!");
+        // Attempt to identify missing elements
+        const ids = ['instructions', 'score', 'feedback', 'info-display', 'info-name', 'info-details', 'toggle-lobes', 'toggle-deep', 'toggle-nerves', 'clip-enable', 'clip-axis', 'clip-slider', 'clip-value', 'clip-negate'];
+        ids.forEach(id => {
+            if (!document.getElementById(id)) {
+                console.error(`Missing UI element: #${id}`);
+            }
+        });
+        return false; // Indicate failure
     }
-    hideInfo(); // Start with info hidden
-    return true;
+
+    // Store callbacks
+    onLayerToggleCallback = layerToggleCb;
+    onClippingChangeCallback = clippingChangeCb;
+
+    // --- Add Event Listeners ---
+    toggleLobesCheckbox.addEventListener('change', handleLayerToggle);
+    toggleDeepCheckbox.addEventListener('change', handleLayerToggle);
+    toggleNervesCheckbox.addEventListener('change', handleLayerToggle);
+
+    clipEnableCheckbox.addEventListener('change', handleClippingChange);
+    clipAxisSelect.addEventListener('change', handleClippingChange);
+    clipSlider.addEventListener('input', handleClippingSlider); // 'input' for live updates
+    clipNegateCheckbox.addEventListener('change', handleClippingChange);
+
+    // --- Initial State Setup ---
+    hideInfo();
+    updateClipValueDisplay(clipSlider.value);
+    // Trigger initial updates based on default UI state
+    handleLayerToggle();
+    handleClippingChange();
+
+    return true; // Indicate successful initialization
 }
 
-function updateScore(newScore) {
-    if (scoreElement) {
-        scoreElement.textContent = `Score: ${newScore}`;
+// --- Event Handlers ---
+function handleLayerToggle() {
+    if (onLayerToggleCallback) {
+        const layersState = {
+            lobes: toggleLobesCheckbox.checked,
+            deep: toggleDeepCheckbox.checked,
+            nerves: toggleNervesCheckbox.checked,
+        };
+        onLayerToggleCallback(layersState);
+    } else {
+        console.warn("Layer toggle callback not set!");
     }
+}
+
+function handleClippingChange() {
+     if (onClippingChangeCallback) {
+         const clippingState = {
+             enabled: clipEnableCheckbox.checked,
+             axis: clipAxisSelect.value, // 'X', 'Y', or 'Z'
+             position: parseFloat(clipSlider.value),
+             negate: clipNegateCheckbox.checked
+         };
+         onClippingChangeCallback(clippingState);
+     } else {
+         console.warn("Clipping change callback not set!");
+     }
+}
+
+function handleClippingSlider() {
+    const value = parseFloat(clipSlider.value);
+    updateClipValueDisplay(value);
+    // Only trigger the full update if clipping is currently enabled
+    if (clipEnableCheckbox.checked) {
+         handleClippingChange(); // Re-trigger update with new position
+    }
+}
+
+function updateClipValueDisplay(value) {
+    if (clipValueSpan) {
+        clipValueSpan.textContent = value.toFixed(1);
+    }
+}
+
+// --- Existing UI Functions ---
+function updateScore(newScore) {
+    if (scoreElement) scoreElement.textContent = `Score: ${newScore}`;
 }
 
 function displayInstruction(text) {
-    if (instructionElement) {
-        instructionElement.textContent = text;
-    }
+    if (instructionElement) instructionElement.textContent = text;
 }
 
 function showFeedback(message, isCorrect, duration = 2000) {
     if (feedbackElement) {
         feedbackElement.textContent = message;
-        feedbackElement.className = isCorrect ? 'correct' : 'incorrect'; // Use classes for styling
-        feedbackElement.style.opacity = 1; // Make visible
-
-        // Fade out after duration
-        // Clear previous timeout if exists
-        if (feedbackElement.timeoutId) {
-            clearTimeout(feedbackElement.timeoutId);
-        }
+        feedbackElement.className = isCorrect ? 'correct' : 'incorrect';
+        feedbackElement.style.opacity = 1;
+        if (feedbackElement.timeoutId) clearTimeout(feedbackElement.timeoutId);
         feedbackElement.timeoutId = setTimeout(() => {
              feedbackElement.style.opacity = 0;
-             feedbackElement.timeoutId = null; // Clear the stored ID
+             feedbackElement.timeoutId = null;
         }, duration);
     }
 }
 
 function showWinMessage(finalScore) {
-     if (instructionElement) {
-        instructionElement.textContent = `Congratulations! You identified all lobes!`;
-    }
+     if (instructionElement) instructionElement.textContent = `Phase Complete! Final Score: ${finalScore}`;
      if (feedbackElement) {
-        feedbackElement.textContent = `Final Score: ${finalScore}`;
+        feedbackElement.textContent = `Great job!`;
         feedbackElement.className = 'correct';
         feedbackElement.style.opacity = 1;
-        // Don't auto-hide win message
-        if (feedbackElement.timeoutId) {
-            clearTimeout(feedbackElement.timeoutId);
-            feedbackElement.timeoutId = null;
-        }
+        if (feedbackElement.timeoutId) clearTimeout(feedbackElement.timeoutId);
+        feedbackElement.timeoutId = null; // Don't auto-hide win message
     }
 }
 
-// --- New Info Display Functions ---
-
 function displayInfo(name, details) {
     if (infoDisplayElement && infoNameElement && infoDetailsElement) {
-        infoNameElement.textContent = name || ''; // Handle potential undefined name
-        infoDetailsElement.textContent = details || ''; // Handle potential undefined details
-        infoDisplayElement.style.display = 'block'; // Make it visible
+        infoNameElement.textContent = name || '';
+        infoDetailsElement.textContent = details || '';
+        infoDisplayElement.style.display = 'block';
     }
 }
 
 function hideInfo() {
      if (infoDisplayElement) {
-        infoDisplayElement.style.display = 'none'; // Hide it
+        infoDisplayElement.style.display = 'none';
         infoNameElement.textContent = '';
         infoDetailsElement.textContent = '';
      }
 }
 
-
+// --- Export necessary functions ---
 export {
     initUI,
     updateScore,
     displayInstruction,
     showFeedback,
     showWinMessage,
-    displayInfo, // Export new function
-    hideInfo     // Export new function
-<<<<<<< HEAD
+    displayInfo,
+    hideInfo
 };
-=======
-};
->>>>>>> 6d0e3509b060d413bb2268cc0a34a16f0e8d46c5

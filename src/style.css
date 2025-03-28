@@ -64,3 +64,83 @@ html, body {
 #feedback.incorrect {
     color: #f44336; /* Red */
 }
+
+/* Info Display Box */
+#info-display {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: rgba(20, 20, 50, 0.7); /* Slightly different background */
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-height: 50px; /* Ensure it has some height even when empty */
+    display: none; /* Initially hidden */
+}
+
+#info-display h3 {
+    margin-bottom: 5px;
+    color: #50e3c2; /* Match brainstem color or choose another */
+    font-size: 1.1em;
+}
+
+#info-display p {
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* Layer Toggles & Clipping Controls Styling */
+#layer-toggles, #clipping-controls {
+    background-color: rgba(10, 10, 30, 0.6);
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 10px; /* Consistent spacing */
+}
+
+#layer-toggles h4, #clipping-controls h4 {
+    margin-bottom: 8px;
+    font-size: 1em;
+    color: #aaa;
+    border-bottom: 1px solid #444; /* Separator */
+    padding-bottom: 4px;
+}
+
+#layer-toggles label, #clipping-controls label {
+    display: block; /* Make labels take full width for better spacing */
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+#clipping-controls label {
+    display: inline-block; /* Keep clipping labels inline where needed */
+    margin-right: 10px;
+}
+#clipping-controls label[for="clip-slider"] { /* Style label for slider specifically */
+     display: block;
+     margin-bottom: 2px;
+}
+
+
+#clipping-controls input[type="range"] {
+    vertical-align: middle;
+    width: calc(100% - 40px); /* Adjust width to fit next to value */
+    display: inline-block;
+}
+#clipping-controls #clip-value {
+    display: inline-block;
+    width: 35px; /* Fixed width for value display */
+    text-align: right;
+}
+
+#clipping-controls select {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+/* Ensure checkboxes are aligned nicely */
+input[type="checkbox"] {
+    vertical-align: middle;
+    margin-right: 5px;
+}

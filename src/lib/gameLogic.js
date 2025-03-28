@@ -322,8 +322,4 @@ function handleNerveQuizAttempt(clickedData) {
 
 
 // Export the necessary functions
-<<<<<<< HEAD
 export { startGame, handleSelection };
-=======
-export { startGame, handleSelection };
->>>>>>> 6d0e3509b060d413bb2268cc0a34a16f0e8d46c5
