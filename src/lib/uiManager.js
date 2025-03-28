@@ -60,7 +60,8 @@ function initUI(layerToggleCb, clippingChangeCb) {
 
     // --- Initial State Setup ---
     hideInfo();
-    updateClipValueDisplay(clipSlider.value);
+    // Ensure initial value is parsed correctly before display
+    updateClipValueDisplay(parseFloat(clipSlider.value)); // Parse float here for the initial call
     // Trigger initial updates based on default UI state
     handleLayerToggle();
     handleClippingChange();
@@ -98,28 +99,29 @@ function handleClippingChange() {
 
 function handleClippingSlider() {
     const value = parseFloat(clipSlider.value);
-    updateClipValueDisplay(value);
+    updateClipValueDisplay(value); // Update display with parsed value
     // Only trigger the full update if clipping is currently enabled
     if (clipEnableCheckbox.checked) {
          handleClippingChange(); // Re-trigger update with new position
     }
 }
 
-
 function updateClipValueDisplay(value) {
     if (clipValueSpan) {
-        // *** ADD CHECK HERE ***
-        // Ensure 'value' is a finite number before calling toFixed()
-        if (typeof value === 'number' && isFinite(value)) {
+        // *** REFINED CHECK ***
+        // Check specifically if the value is NOT NaN after potential parseFloat
+        if (!isNaN(value)) { // isNaN() correctly handles the NaN case
             clipValueSpan.textContent = value.toFixed(1);
         } else {
-            // Handle cases where value is NaN or not a number (e.g., initial state or error)
-            clipValueSpan.textContent = '---'; // Or '0.0' or some default
-            console.warn("updateClipValueDisplay received invalid value:", value); // Log warning
+            // Handle cases where value is NaN (parsing failed)
+            clipValueSpan.textContent = '---'; // Default display for invalid state
+            // Keep the warning, it's useful if this state occurs unexpectedly
+            console.warn("updateClipValueDisplay received invalid (NaN) value:", value);
         }
         // *********************
     }
 }
+
 
 // --- Existing UI Functions ---
 function updateScore(newScore) {
