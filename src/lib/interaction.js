@@ -2,11 +2,11 @@
 import * as THREE from 'three';
 import { camera, renderer } from './sceneSetup.js';
 import { handleSelection } from './gameLogic.js';
-import { displayInfo, hideInfo } from './uiManager.js';
+import { displayInfo, hideInfo } from './uiManager.js'; // Ensure these are imported
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-let interactableObjects = []; // Master list
+let interactableObjects = [];
 let hoveredObject = null;
 let selectedObject = null;
 
@@ -15,27 +15,19 @@ function initInteraction(objectsToInteract) {
     renderer.domElement.addEventListener('mousemove', onMouseMove, false);
     renderer.domElement.addEventListener('click', onClick, false);
     renderer.domElement.addEventListener('mousedown', onMouseDownOutside, false);
-    console.log(`Interaction initialized with ${interactableObjects.length} objects.`); // Add log
+    console.log(`Interaction initialized with ${interactableObjects.length} objects.`);
 }
 
-// Helper to apply material state
 function applyMaterial(object, materialType) {
-    if (!object || !object.userData || !object.userData.originalMaterial) {
-        // console.warn("applyMaterial: Invalid object or missing material data", object);
-        return;
-    }
-    let targetMaterial = object.userData.originalMaterial; // Default
+    if (!object || !object.userData || !object.userData.originalMaterial) { return; }
+    let targetMaterial = object.userData.originalMaterial;
     switch (materialType) {
         case 'highlight': targetMaterial = object.userData.highlightMaterial || targetMaterial; break;
         case 'selected': targetMaterial = object.userData.selectedMaterial || targetMaterial; break;
     }
-    // Check if material actually needs changing
-    if (object.material !== targetMaterial) {
-        object.material = targetMaterial;
-    }
+    if (object.material !== targetMaterial) { object.material = targetMaterial; }
 }
 
-// Filter for Visible Objects
 function getVisibleInteractableObjects() {
     return interactableObjects.filter(obj => {
         if (!obj || !obj.isObject3D) return false;
@@ -49,7 +41,6 @@ function getVisibleInteractableObjects() {
     });
 }
 
-// Event Handlers using Filtered Raycasting
 function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -78,15 +69,34 @@ function onClick(event) {
 
     if (intersects.length > 0) {
         const clickedObj = intersects[0].object;
-        if (clickedObj.userData && clickedObj.userData.originalMaterial) { // Ensure it's one of ours
+        // --- Add Debugging for Click ---
+        console.log("Clicked on:", clickedObj.userData?.name || 'Unknown Object', clickedObj);
+        if (clickedObj.userData && clickedObj.userData.originalMaterial) { // Check has our data
             if (selectedObject && selectedObject !== clickedObj) { applyMaterial(selectedObject, 'original'); }
             selectedObject = clickedObj;
             applyMaterial(selectedObject, 'selected');
-            displayInfo(selectedObject.userData.name, selectedObject.userData.info);
-            handleSelection(selectedObject); // Pass mesh to game logic
+
+            // --- Add Debugging before displayInfo ---
+            console.log("Attempting to display info:", selectedObject.userData.name, selectedObject.userData.info);
+            // Ensure the info property exists and has content
+            if (typeof selectedObject.userData.info !== 'undefined') {
+                 displayInfo(selectedObject.userData.name, selectedObject.userData.info);
+            } else {
+                 console.warn("Object clicked, but userData.info is missing:", selectedObject.userData);
+                 displayInfo(selectedObject.userData.name, "[Information not available]"); // Show placeholder
+            }
+            // -----------------------------------------
+
+            handleSelection(selectedObject);
             event.stopPropagation();
         } else {
-            // console.warn("Clicked on object without expected userData:", clickedObj);
+             console.warn("Clicked object ignored (missing userData or originalMaterial):", clickedObj);
+             // If something selectable was already selected, deselect it by clicking non-interactive part
+             if (selectedObject) {
+                applyMaterial(selectedObject, 'original');
+                selectedObject = null;
+                hideInfo();
+             }
         }
     }
     // Background click handled by onMouseDownOutside
@@ -98,9 +108,9 @@ function onMouseDownOutside(event) {
     raycaster.setFromCamera(mouse, camera);
     const visibleObjects = getVisibleInteractableObjects();
     const intersects = raycaster.intersectObjects(visibleObjects, false);
-    if (intersects.length === 0) { // Clicked outside any VISIBLE interactable object
+    if (intersects.length === 0) {
         if (selectedObject) { applyMaterial(selectedObject, 'original'); selectedObject = null; }
-        hideInfo();
+        hideInfo(); // Call hideInfo when clicking outside
     }
 }
 export { initInteraction };
