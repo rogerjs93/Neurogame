@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { camera, renderer } from './sceneSetup.js';
 import { handleSelection } from './gameLogic.js';
-import { displayInfo, hideInfo } from './uiManager.js'; // Ensure these are imported
+import { displayInfo, hideInfo } from './uiManager.js';
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -11,6 +11,11 @@ let hoveredObject = null;
 let selectedObject = null;
 
 function initInteraction(objectsToInteract) {
+    if (!Array.isArray(objectsToInteract)) { // Add check
+         console.error("initInteraction received invalid input:", objectsToInteract);
+         interactableObjects = [];
+         return;
+    }
     interactableObjects = objectsToInteract;
     renderer.domElement.addEventListener('mousemove', onMouseMove, false);
     renderer.domElement.addEventListener('click', onClick, false);
@@ -69,37 +74,25 @@ function onClick(event) {
 
     if (intersects.length > 0) {
         const clickedObj = intersects[0].object;
-        // --- Add Debugging for Click ---
         console.log("Clicked on:", clickedObj.userData?.name || 'Unknown Object', clickedObj);
-        if (clickedObj.userData && clickedObj.userData.originalMaterial) { // Check has our data
+        if (clickedObj.userData && clickedObj.userData.originalMaterial) {
             if (selectedObject && selectedObject !== clickedObj) { applyMaterial(selectedObject, 'original'); }
             selectedObject = clickedObj;
             applyMaterial(selectedObject, 'selected');
-
-            // --- Add Debugging before displayInfo ---
             console.log("Attempting to display info:", selectedObject.userData.name, selectedObject.userData.info);
-            // Ensure the info property exists and has content
             if (typeof selectedObject.userData.info !== 'undefined') {
                  displayInfo(selectedObject.userData.name, selectedObject.userData.info);
             } else {
                  console.warn("Object clicked, but userData.info is missing:", selectedObject.userData);
-                 displayInfo(selectedObject.userData.name, "[Information not available]"); // Show placeholder
+                 displayInfo(selectedObject.userData.name, "[Information not available]");
             }
-            // -----------------------------------------
-
             handleSelection(selectedObject);
             event.stopPropagation();
         } else {
              console.warn("Clicked object ignored (missing userData or originalMaterial):", clickedObj);
-             // If something selectable was already selected, deselect it by clicking non-interactive part
-             if (selectedObject) {
-                applyMaterial(selectedObject, 'original');
-                selectedObject = null;
-                hideInfo();
-             }
+             if (selectedObject) { applyMaterial(selectedObject, 'original'); selectedObject = null; hideInfo(); }
         }
     }
-    // Background click handled by onMouseDownOutside
 }
 
 function onMouseDownOutside(event) {
@@ -110,7 +103,7 @@ function onMouseDownOutside(event) {
     const intersects = raycaster.intersectObjects(visibleObjects, false);
     if (intersects.length === 0) {
         if (selectedObject) { applyMaterial(selectedObject, 'original'); selectedObject = null; }
-        hideInfo(); // Call hideInfo when clicking outside
+        hideInfo();
     }
 }
 export { initInteraction };
