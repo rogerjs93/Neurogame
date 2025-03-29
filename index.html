@@ -12,7 +12,7 @@
     <div id="ui-container">
         <h1>Neuro Explorer</h1>
         <div id="brain-ui">
-             <div id="instructions">Loading...</div>
+             <div id="instructions">Loading Brain Model...</div> <!-- Updated initial message -->
              <div id="score">Score: 0</div>
              <div id="feedback"></div>
              <div id="info-display">
@@ -21,9 +21,9 @@
              </div>
              <div id="layer-toggles" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
                   <h4>Layers:</h4>
-                  <label><input type="checkbox" id="toggle-lobes" checked> Lobes (Cortex)</label><br>
+                  <label><input type="checkbox" id="toggle-lobes" checked> Lobes/Cortex</label><br>
                   <label><input type="checkbox" id="toggle-deep" checked> Deep Structures</label><br>
-                  <label><input type="checkbox" id="toggle-nerves" checked> Cranial Nerves</label>
+                  <label><input type="checkbox" id="toggle-nerves" checked> Cranial Nerves</label> <!-- Keep even if not loaded yet -->
              </div>
              <div id="clipping-controls" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
                   <h4>Clipping (Section):</h4>
@@ -36,7 +36,7 @@
                       </select>
                    </label><br>
                   <label>Position:</label>
-                  <input type="range" id="clip-slider" min="-7" max="7" step="0.1" value="0" style="width: 100%;">
+                  <input type="range" id="clip-slider" min="-10" max="10" step="0.1" value="0" style="width: 100%;"> <!-- Wider range for loaded models -->
                   <span id="clip-value">0.0</span><br>
                   <label><input type="checkbox" id="clip-negate"> Flip Side</label>
              </div>
